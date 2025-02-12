@@ -1,0 +1,17 @@
+.container {
+  margin: 20px 0;
+}
+
+.label {
+  display: block;
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.input {
+  display: none;
+}

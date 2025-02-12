@@ -1,0 +1,17 @@
+.bubble {
+    max-width: 70%;
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+  }
+  
+  .question {
+    background-color: #e2e8f0;
+    align-self: flex-start;
+  }
+  
+  .answer {
+    background-color: #007bff;
+    color: white;
+    align-self: flex-end;
+  }
