@@ -38,12 +38,6 @@ class DeepSeekModel(AIModel):
             # Call the Deepseek API
             client = OpenAI(api_key=self.api_key, base_url="https://openrouter.ai/api/v1") 
             # logger.debug(f"prompt : {prompt}")
-            # print("Sending payload:", {
-            #     "model": self.llm_model,
-            #     "messages": [{"role": "user", "content": prompt}],
-            #     "temperature": 0.4,
-            #     # "max_tokens": 5000,
-            # })
             
             response = client.chat.completions.create(
                 model=self.llm_model, 
@@ -51,13 +45,13 @@ class DeepSeekModel(AIModel):
                 temperature=0.4,  # Controls creativity (0 = deterministic, 1 = creative)
                 # max_tokens=500,   # Limit the length of the response
             )
-            print("response-------------------------------- : ", response)
+            logger.debug("response-------------------------------- : ", response)
             # Extract and return the generated text
             return response.choices[0].message.content.strip()
 
         except Exception as e:
             # Handle errors gracefully
-            print(f"Error calling LLM: {e}")
+            logger.error(f"Error calling LLM: {e}")
             return "Sorry, I couldn't generate a response. Please try again."
     
     
@@ -72,7 +66,6 @@ class AIAdapter:
         for config in configs:
             logger.debug(f"config in create model of AIAdapter : {config}")
             if model_type in config.get("name"):
-                logger.debug(f"config in create model of AIAdapter : {config}")
                 llm_model = config['model_name'][0]
                 logger.debug(f"llm_model : {llm_model}")
                 llm_api_key = config['api_key']

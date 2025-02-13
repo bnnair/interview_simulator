@@ -3,7 +3,6 @@ import styles from '../styles/InterviewPanel.module.css';
 export default function InterviewPanel({
   question,
   answer,
-  // onAnswerChange,
   onSubmit,
   chatHistory,
   isLoading,
@@ -23,13 +22,7 @@ export default function InterviewPanel({
         ))}
       </div>
 
-      <div className={styles.inputArea}>
-        {/* <textarea
-          value={answer}
-          onChange={(e) => onAnswerChange(e.target.value)}
-          placeholder="Type your answer here..."
-          disabled={isLoading}
-        /> */}
+      <div className={styles.inputArea}>{}
         <button onClick={onSubmit} disabled={isLoading}>
           {isLoading ? 'generating Question...' : 'Start Interview'}
         </button>

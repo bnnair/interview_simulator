@@ -45,6 +45,3 @@ class ConfigManager:
             # logger.debug(f"api_key_string : {api_str}")    
         logger.debug(f"config :{config_list}")    
         return config_list
-
-# if __name__ == '__main__':
-#     ConfigManager.update_config()

@@ -1,9 +1,9 @@
 from PyPDF2 import PdfReader
 from langchain_community.document_loaders import PyPDFLoader
-
+from loguru import logger
 
 def parse_pdf(file):
-    print("inside parse_pdf")
+    logger.debug("inside parse_pdf")
     text = ""
     reader = PdfReader(file)
     for page in reader.pages:
@@ -12,14 +12,9 @@ def parse_pdf(file):
 
 
 def load_pdf(file):
-    print("inside load_pdf")
-    print(file)
+    logger.debug("inside load_pdf")
+    logger.debug(file)
     loader = PyPDFLoader(file)
     pages = loader.load()
     
     return pages 
-
-
-
-    
-    # print(parse_pdf("D:\workspaces\workspace-5\interview-simulator copy\data\BijuNair-resume.pdf"))

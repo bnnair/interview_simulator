@@ -67,23 +67,14 @@ export default function Home() {
   };
 
   const submitAnswer = async () => {
-    // if (!userAnswer.trim()) return;
-    
     setIsLoading(true);
     try {
-      // Add user answer to history
-      // setChatHistory(prev => [...prev, { type: 'answer', content: userAnswer }]);
-      
       const response = await api.post('/api/submit-answer', 
         resume,
-        // question: currentQuestion,
-        // answer: currentAnswer
       );
-
       // Add evaluation and new question
       setChatHistory(prev => [
         ...prev,
-        // { type: 'evaluation', content: response.data.evaluation },
         { type: 'question', content: response.data.question },
         { type: 'answer', content: response.data.answer }
       ]);
@@ -122,8 +113,6 @@ export default function Home() {
             <InterviewPanel
               question={currentQuestion}
               answer={currentAnswer}
-              // onAnswerChange={setCurrentAnswer}
-              // onSubmit={submitAnswer}
               onSubmit={startInterview}
               chatHistory={chatHistory}
               isLoading={isLoading}

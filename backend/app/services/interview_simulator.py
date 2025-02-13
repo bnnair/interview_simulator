@@ -2,6 +2,7 @@ from openai import OpenAI
 import os
 from utils.config_manager import ConfigManager
 from services.llm_manager import AIAdapter
+from loguru import logger
 
 class InterviewManager:
     def __init__(self, enhanced_resume, model_type):
@@ -13,30 +14,14 @@ class InterviewManager:
         """
         Helper method to call the LLM with a given prompt.
         """
-        print("inside the call llm in InterviewManager")
+        logger.debug("inside the call llm in InterviewManager")
 
         config = ConfigManager.update_config()
-        print(f"config : {config}")
+        logger.debug(f"config : {config}")
         adapter = AIAdapter(config, self.model_type)
-        print(f"adapter : {adapter}")
+        logger.debug(f"adapter : {adapter}")
         response = adapter.invoke(prompt)
         return response
-        # client = OpenAI(api_key=os.environ["DEEPSEEK_API_KEY_1"], base_url="https://openrouter.ai/api/v1")
-        # try:
-        #     # Call the OpenAI API
-        #     response = client.chat.completions.create(
-        #         model="deepseek/deepseek-r1-distill-llama-8b",
-        #         # model="gpt-4o-mini",  # Use GPT-4
-        #         messages=[{"role": "user", "content": prompt}],
-        #         temperature=0.4,  # Controls creativity (0 = deterministic, 1 = creative)
-        #         max_tokens=5000,   # Limit the length of the response
-        #     )
-        #     # Extract and return the generated text
-        #     return response.choices[0].message.content.strip()
-        # except Exception as e:
-        #     # Handle errors gracefully
-        #     print(f"Error calling LLM: {e}")
-        #     return "Sorry, I couldn't generate a response. Please try again."
 
     def generate_question(self):
         prompt = f"""
