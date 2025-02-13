@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, field_validator
 from typing import List, Optional
 
 class Experience(BaseModel):
@@ -6,6 +6,13 @@ class Experience(BaseModel):
     position: str
     duration: str
     responsibilities: Optional[List[str]] = None
+    ### included for deepseek model not for openai
+    @field_validator('responsibilities', mode='before')
+    def split_responsibilities(cls, v):
+        if isinstance(v, str):
+            # Split the string into a list of responsibilities
+            return [resp.strip() for resp in v.split(". ") if resp.strip()]
+        return v
 
 class Education(BaseModel):
     institution: str
