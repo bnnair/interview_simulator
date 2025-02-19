@@ -1,5 +1,5 @@
 # backend/app/main.py
-from fastapi import FastAPI, UploadFile, File, HTTPException, status
+from fastapi import FastAPI, UploadFile, File, HTTPException, status, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import os
@@ -26,8 +26,13 @@ from langchain.chains.llm import LLMChain
 from utils.config_manager import ConfigManager
 from services.llm_manager import AIAdapter
 
+from sqlalchemy.orm import Session
+from models.db_models import SessionLocal, InterviewSession, ResumeDB
+
 # Load environment variables
 load_dotenv()
+resume_id = 1
+
 
 app = FastAPI(
     title="AI Resume Enhancer & Interview Simulator",
@@ -43,6 +48,16 @@ app.add_middleware(
     allow_headers=["*"], ## for production, this should be limited to specific headers
 )
 
+# Dependency to get the database session
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+user_id = "bnnair"
+
 # Custom exception handler
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request, exc):
@@ -51,15 +66,33 @@ async def http_exception_handler(request, exc):
         content={"detail": exc.detail},
     )
 
+@app.get("/api/get-all-resumes")
+async def get_all_resumes(db: Session = Depends(get_db)):
+    try:
+        resumes = db.query(ResumeDB).all()
+        return [
+            {
+                "id": resume.id,
+                "user_id": resume.user_id,
+                "resume_data": resume.resume_data,
+            }
+            for resume in resumes
+        ]
+    except Exception as e:
+        logger.error(f"Error retrieving resume from database: {e}")
+
+    return None
+
+
 @app.post(
     "/api/upload-resume",
-    response_model=Resume, #ResumeEnhancementResponse,
+    response_model=Resume, 
     responses={
         400: {"model": HTTPError, "description": "Invalid file format"},
         500: {"model": HTTPError, "description": "Resume processing error"}
     }
 )
-async def upload_resume(file: UploadFile = File(...)):
+async def upload_resume(file: UploadFile = File(...), db: Session = Depends(get_db)):
     """
     Upload a PDF resume and get back an enhanced version
     """
@@ -98,9 +131,23 @@ async def upload_resume(file: UploadFile = File(...)):
         response = aiadapter.invoke(prompt.format(context=pages))
         response1 = parser.invoke(response)
         
-        logger.debug(f"response-------------- : {response1}")   
-                
-        logger.info("completed Response")
+        # logger.debug(f"response-------------- : {response1}")   
+
+        try:
+            # Store the resume in the database
+            db_session = ResumeDB(user_id=user_id, resume_data=response1)
+            logger.info(f"db_session ---------->{db_session}")
+            # db_session = InterviewSession(resume_id=resume.id, question=question, answer="")
+            db.add(db_session)
+            db.commit()
+            db.refresh(db_session)
+            resume_id = db_session.id
+            logger.info(f"resume_id ----------> {resume_id}") 
+
+        except Exception as e:
+            logger.error(f"Error storing resume in database: {e}")
+            
+        logger.info(f"completed Response------>{response1}")
         return Resume(**response1)        
         
     except Exception as e:
@@ -117,7 +164,7 @@ async def upload_resume(file: UploadFile = File(...)):
         500: {"model": HTTPError, "description": "Interview generation error"}
     }
 )
-async def start_interview(enhanced_resume: Resume):
+async def start_interview(enhanced_resume: Resume, db: Session = Depends(get_db)):
     """
     Start a new interview session based on the provided resume
     """
@@ -126,12 +173,36 @@ async def start_interview(enhanced_resume: Resume):
     try:
         MODEL_TYPE = "deepseek"
         # # Parse the enhanced resume into a structured Resume object
-        logger.debug(enhanced_resume)
+        # logger.debug(enhanced_resume)
+        
+        # Generate the next question, avoiding duplicates
+        # prev_answer = ""
+        # prev_question =""
+
+        previous = db.query(InterviewSession.question, InterviewSession.answer).filter(InterviewSession.resume_id == resume_id).all()
+        logger.info(f"DB data ----> {previous}")
+        prev_questions = [q[0] for q in previous]  # Extract questions from query result
+        prev_quest = previous[-1][0]
+        logger.info(f"previous question asked was ---------: {prev_quest}")
+        prev_ans = previous[-1][1]
+        logger.info(f"previous answer was ---------: {prev_ans}")
+
+        logger.info(f"previous_questions : {prev_questions}")         
+    
+        logger.info("calling interviewManager now..........")
         interview_manager = InterviewManager(enhanced_resume, MODEL_TYPE)
-        question = interview_manager.generate_question()
+        question = interview_manager.generate_question(prev_quest,prev_ans, prev_questions) 
+        # question = interview_manager.generate_question()
         logger.debug(f"question : {question}")
         llmanswer = interview_manager.generate_answer(question)
         logger.debug(f"llmanswer : {llmanswer}")
+
+        # Store the answer in the database
+
+        db_session = InterviewSession(resume_id=resume_id, question= question, answer=llmanswer)
+        db.add(db_session)
+        db.commit()
+
         return InterviewResponse(
             question=question,
             answer=llmanswer

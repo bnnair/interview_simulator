@@ -1,0 +1,106 @@
+{
+  "name": "Biju Nair",
+  "contact_info": "bnnair@yahoo.com, bnnair@gmail.com",
+  "summary": "Seasoned IT professional with 19+ years of experience in information technology, specializing in project and product management, techno-functional management, and data science. Proven track record in translating business needs into technology requirements and managing all phases of IT projects, from needs analysis to implementation and training. Expertise in agile management, AWS cloud computing, and data science algorithms. Recently completed MTech in Data Science Engineering, developing a strong foundation in the field's technical and theoretical aspects.",
+  "experiences": [
+    {
+      "company": "Fulcrum Digital Private Limited",
+      "position": "Senior Technical Project Manager",
+      "duration": "Jan 2021 – Oct 2022",
+      "responsibilities": [
+        "Led two project teams consisting of 40+ resources, managing payment product enhancement for MasterCard (UK)",
+        "Managed fixed-bid project, ensuring delivery of a specific number of story points per iteration",
+        "Coordinated with interdepartmental teams (DevOps, product, infrastructure, performance) to optimize task management",
+        "Identified and mitigated project risks, updating the client regularly",
+        "Implemented quality initiatives for the entire Consumer App project portfolio"
+      ]
+    },
+    {
+      "company": "HSBC Software Development India Pvt. Ltd.",
+      "position": "Technical Project Manager",
+      "duration": "Apr 2010 - Jan 2017",
+      "responsibilities": [
+        "Led significant projects under Staff Transformation Program, including AWS cloud migration and DevOps implementation",
+        "Managed end-to-end project lifecycle for re-engineering of banking applications using microservice architecture",
+        "Implemented agile scrum ceremonies (Scrum of Scrum) to enhance project visibility and collaboration",
+        "Drove performance and quality improvements, managing vendor resources from Wipro, Infosys, and Cap Gemini",
+        "Effectively communicated project status and risks to senior management and clients"
+      ]
+    },
+    {
+      "company": "HSBC Software Development India Pvt. Ltd.",
+      "position": "Tech Lead",
+      "duration": "April 2007 - April 2010",
+      "responsibilities": [
+        "Managed the HFE Enhancement project, overseeing all aspects including planning, execution, and implementation",
+        "Developed HLD and LLD, provided work breakdowns, and assigned tasks to project team members",
+        "Defined and implemented quality targets, achieving a high Sonar quality index for the team"
+      ]
+    },
+    {
+      "company": "HSBC Software Development India Pvt. Ltd.",
+      "position": "Senior Software Engineer",
+      "duration": "May 2005 - April 2007",
+      "responsibilities": []
+    },
+    {
+      "company": "CMC Limited",
+      "position": "Software Engineer / Developer",
+      "duration": "Feb 2000 - May 2005",
+      "responsibilities": []
+    }
+  ],
+  "education": [
+    {
+      "institution": "BITS, Pilani",
+      "degree": "MTech",
+      "field_of_study": "Data Science Engineering",
+      "duration": "Nov 2021 – Nov 2023"
+    },
+    {
+      "institution": "Unknown",
+      "degree": "B.E",
+      "field_of_study": "Instrumentation",
+      "duration": "1999"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Data Science",
+      "description": "Python, Machine Learning Algorithms, Deep Learning, Data Manipulation and Visualization, Data Science Engineering, computer vision, NLP, LLM, RAG, etc."
+    },
+    {
+      "name": "Project Management",
+      "description": "Agile Scrum, Waterfall, Project Planning and Execution, Risk Management, Budgeting, Vendor Management, Stakeholder Engagement"
+    },
+    {
+      "name": "Software Development",
+      "description": "Java/J2EE, Spring MVC, Spring, Spring Boot, Microservices, Docker, Kubernetes"
+    },
+    {
+      "name": "Agile",
+      "description": "Scrum Master, Kanban, sprint planning, daily stand-ups"
+    },
+    {
+      "name": "Cloud Computing",
+      "description": "AWS Solution Architect Certified"
+    }
+  ],
+  "certifications": [
+    {
+      "name": "M-Tech in Data Science Engineering"
+    },
+    {
+      "name": "Self Driving Car Nanodegree"
+    },
+    {
+      "name": "Data Science Course"
+    },
+    {
+      "name": "AWS Solution Architect – Associate Certification"
+    },
+    {
+      "name": "Project Management Professional (PMP)"
+    }
+  ]
+}

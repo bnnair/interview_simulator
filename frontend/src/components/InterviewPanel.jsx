@@ -9,6 +9,7 @@ export default function InterviewPanel({
 }) {
   return (
     <div className={styles.container}>
+      <h1>Interview Questions and Answers</h1>
       <div className={styles.chatHistory}>
         {chatHistory.map((chat, i) => (
           <div
@@ -24,7 +25,7 @@ export default function InterviewPanel({
 
       <div className={styles.inputArea}>{}
         <button onClick={onSubmit} disabled={isLoading}>
-          {isLoading ? 'generating Question...' : 'Start Interview'}
+          {isLoading ? 'Generating Question and Answer...' : 'Next Question'}
         </button>
       </div>
     </div>
