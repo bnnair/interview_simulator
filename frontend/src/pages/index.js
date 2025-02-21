@@ -15,6 +15,8 @@ export default function Home() {
   const [error, setError] = useState(null);
   const [resumes, setResumes] = useState([]); // Store all resumes
   const [selectedResume, setSelectedResume] = useState(null); // Store the selected resume
+  const [userQuestion, setUserQuestion] = useState(""); // Store user-input question
+  const [useUserQuestion, setUseUserQuestion] = useState(false); // Toggle between user and app-generated question
 
 
   // Configure Axios to point to your Python backend
@@ -89,14 +91,36 @@ export default function Home() {
     setIsLoading(true);
     try {
       console.log("inside try block in start interview method in index.js");
-      const response = await api.post('/api/start-interview', selectedResume, {}  );
-      setCurrentQuestion(response.data.question);
+      console.log("user question ---->", userQuestion)
+      console.log("selected REsume ------", selectedResume)
+
+      const payload = {
+        resume : selectedResume,
+        user_question :  useUserQuestion ? userQuestion : null,
+      };
+
+
+      const response = await api.post('/api/start-interview',  payload,{
+        params: {
+          userQuestion: useUserQuestion ? userQuestion : null,
+        },
+      });
+
+      if (useUserQuestion) {
+        // Use the user's question
+        setCurrentQuestion(userQuestion);
+      } else {      
+        setCurrentQuestion(response.data.question);
+      }
+       
       setCurrentAnswer(response.data.answer);
       setChatHistory(prev => [
         ...prev,
-        { type: 'question', content: response.data.question },
-        { type: 'answer', content: response.data.answer },
+        { type: 'question', content: currentQuestion },
+        { type: 'answer', content: currentAnswer },
       ]);
+      setUseUserQuestion(false)
+      setUserQuestion("")
     } catch (err) {
       setError('Failed to start interview');
       console.error('Error starting interview:', err.response?.data || err.message);
@@ -105,85 +129,85 @@ export default function Home() {
     }
   };
 
-  // const submitAnswer = async () => {
-  //   setIsLoading(true);
-  //   try {
-  //     const response = await api.post('/api/submit-answer', 
-  //       resume,
-  //     );
-  //     // Add evaluation and new question
-  //     setChatHistory(prev => [
-  //       ...prev,
-  //       { type: 'question', content: response.data.question },
-  //       { type: 'answer', content: response.data.answer }
-  //     ]);
-      
-  //     setCurrentQuestion(response.data.question);
-  //     setCurrentAnswer(response.data.answer);
-  //   } catch (err) {
-  //     setError('Failed to process answer');
-  //     console.error(err);
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
-
   return (
     <div className={styles.container}>
       <h1>AI Resume Interview Simulator</h1>
-
-      {/* File upload section */}
-      <div>
-        <FileUpload onUpload={handleFileUpload} />
-        {isLoading && <div className={styles.loading}>Uploading...</div>}
-      </div>
-      {/* Dropdown to Select a Resume */}
-      <div>
-        <h2>Select Resume</h2>
-        <select onChange={handleResumeSelect} defaultValue="">
-          <option value="" disabled>
-            Select a resume
-          </option>
-          {/* Option for the uploaded resume */}
-          {uploadedResume && (
-            <option value="uploaded">
-              Uploaded Resume - {uploadedResume.name}
-            </option>
-          )}
-          {/* Options for resumes from the database */}
-          {resumes.map((resume) => (
-            <option key={resume.id} value={resume.id}>
-              Resume ID: {resume.id} - {resume.resume_data.name}
-            </option>
-          ))}
-        </select>
-        {error && <div className={styles.error}>{error}</div>}
-      </div>
-      {(
+        {/* File upload section */}
         <div>
-          { selectedResume ? (
-            <ResumeViewer resume={selectedResume} />
-          ) : (
-            <p>No resume selected.</p>
-          )}
-          {!currentQuestion ? (
-            <button 
-              className={styles.startButton}
-              onClick={startInterview} disabled={ isLoading }
-            >
-              {isLoading ? 'Generating Question and Answer...' : 'Start Interview'}
-            </button>
-          ) : (
-            <InterviewPanel
+          <FileUpload onUpload={handleFileUpload} />
+          {isLoading && <div className={styles.loading}>Uploading...</div>}
+        </div>
+        {/* Dropdown to Select a Resume */}
+        <div>
+          <h2>Select Resume</h2>
+          <select onChange={handleResumeSelect} defaultValue="">
+            <option value="" disabled>
+              Select a resume
+            </option>
+            {/* Option for the uploaded resume */}
+            {uploadedResume && (
+              <option value="uploaded">
+                Uploaded Resume - {uploadedResume.name}
+              </option>
+            )}
+            {/* Options for resumes from the database */}
+            {resumes.map((resume) => (
+              <option key={resume.id} value={resume.id}>
+                Resume ID: {resume.id} - {resume.resume_data.name}
+              </option>
+            ))}
+          </select>
+          {error && <div className={styles.error}>{error}</div>}
+        </div>
+        {(
+          <div>
+            { selectedResume ? (
+              <ResumeViewer resume={selectedResume} />
+            ) : (
+              <p>No resume selected.</p>
+            )}
+          </div>
+        )}
+      <div className = {styles.questionSection}>
+        <h2>Question Input</h2>
+        <label className={styles.checkboxLabel}>
+          <input
+            type="checkbox"
+            checked={useUserQuestion}
+            onChange={(e) => setUseUserQuestion(e.target.checked)}
+          />
+          Use my own question
+        </label>
+
+        { useUserQuestion && (
+        <div className={styles.textareaContainer}>
+          <textarea
+            value={userQuestion}
+            onChange={(e) => setUserQuestion(e.target.value)}
+            placeholder="Type your question here..."
+            rows={4}
+            cols={50}
+          />
+        </div>
+        )}
+        {/* Start interview button */}
+        <button 
+          className={styles.startButton}
+          onClick={startInterview} disabled={ isLoading }
+          >
+          {isLoading  ? 'Generating Question and Answer...' : 'Start Interview'}
+        </button>
+      </div>
+      {/* Interview Panel */}
+      <div className={styles.InterviewPanel}>
+          <InterviewPanel
               question={currentQuestion}
               answer={currentAnswer}
               onSubmit={startInterview}
               chatHistory={chatHistory}
               isLoading={isLoading}
-            />
-          )}
-        </div>
-      )}
+          />
+      </div>
     </div>
-  );
-}
+  )
+};

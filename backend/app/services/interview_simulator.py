@@ -24,7 +24,7 @@ class InterviewManager:
         response = adapter.invoke(prompt)
         return response
 
-    def generate_question(self, prev_question, prev_answer, prev_questions):
+    def generate_question(self, prev_question, prev_questions):
         prompt = f"""
         As professional interviewer, generate a technical question based on:
         {self.resume}
@@ -54,6 +54,6 @@ class InterviewManager:
         3. Infer related technologies if plausible and explain in brief about its usage
         4. Use STAR method for behavioral questions
         5. Explain technical concepts clearly and be a little verbose
-        6. No thinking out loud, only the best possible answer should be given and nothing else.
+        6. do not output any thinking, output only the best possible answer and nothing else.
         """
         return self._call_llm(prompt)

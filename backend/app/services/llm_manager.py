@@ -39,6 +39,7 @@ class DeepSeekModel(AIModel):
             client = OpenAI(api_key=self.api_key, base_url="https://openrouter.ai/api/v1") 
             logger.debug(f"client : {client}")
             logger.info(f"prompt-------: {prompt}")
+            logger.info(f"llm model -----> {self.llm_model}")
             response = client.chat.completions.create(
                 model=self.llm_model, 
                 messages=[{"role": "user", "content": prompt}],

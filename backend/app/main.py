@@ -1,11 +1,12 @@
 # backend/app/main.py
-from fastapi import FastAPI, UploadFile, File, HTTPException, status, Depends
+from fastapi import FastAPI, UploadFile, File, HTTPException, status, Depends,Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import os
 from dotenv import load_dotenv
 import tempfile
 from loguru import logger
+from typing import Optional, List
 
 # Import services
 from services.resume_enhancer import enhance_resume
@@ -14,7 +15,7 @@ from utils.pdf_parser import parse_pdf, load_pdf
 
 # Import models
 from models.interview import InterviewQuestion, InterviewAnswer
-from models.responses import InterviewResponse
+from models.responses import InterviewResponse, InterviewRequest
 from models.errors import HTTPError
 from models.resume import Resume, Experience, Education, Skill
 
@@ -164,21 +165,22 @@ async def upload_resume(file: UploadFile = File(...), db: Session = Depends(get_
         500: {"model": HTTPError, "description": "Interview generation error"}
     }
 )
-async def start_interview(enhanced_resume: Resume, db: Session = Depends(get_db)):
+async def start_interview(request : InterviewRequest, userQuestion: Optional[str] = Query(None),  db: Session = Depends(get_db)):
     """
     Start a new interview session based on the provided resume
     """
-    print("Received Resume:", enhanced_resume.model_dump_json())
+    enhanced_resume = request.resume
+    question1 = userQuestion
+    
+    logger.debug(f"Received Resume======> {enhanced_resume.model_dump_json()}")
+    logger.debug(f"user question =====> {question1}")
     print("inside start interview")
     try:
         MODEL_TYPE = "deepseek"
         # # Parse the enhanced resume into a structured Resume object
         # logger.debug(enhanced_resume)
-        
+        logger.debug("entering the db to get previous questions......")
         # Generate the next question, avoiding duplicates
-        # prev_answer = ""
-        # prev_question =""
-
         previous = db.query(InterviewSession.question, InterviewSession.answer).filter(InterviewSession.resume_id == resume_id).all()
         logger.info(f"DB data ----> {previous}")
         prev_questions = [q[0] for q in previous]  # Extract questions from query result
@@ -191,14 +193,21 @@ async def start_interview(enhanced_resume: Resume, db: Session = Depends(get_db)
     
         logger.info("calling interviewManager now..........")
         interview_manager = InterviewManager(enhanced_resume, MODEL_TYPE)
-        question = interview_manager.generate_question(prev_quest,prev_ans, prev_questions) 
-        # question = interview_manager.generate_question()
+        logger.info(f"User question asked ------> {userQuestion}")
+        
+        if question1 == None:
+            logger.debug("user question got is None............")
+            question = interview_manager.generate_question(prev_quest, prev_questions) 
+        else:
+            logger.debug(f"user question got is--------> {question1} ")
+            question = question1
+
+        
         logger.debug(f"question : {question}")
         llmanswer = interview_manager.generate_answer(question)
         logger.debug(f"llmanswer : {llmanswer}")
 
         # Store the answer in the database
-
         db_session = InterviewSession(resume_id=resume_id, question= question, answer=llmanswer)
         db.add(db_session)
         db.commit()
